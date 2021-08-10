@@ -1,15 +1,43 @@
-import React, { FC, HTMLAttributes, ReactChild } from 'react';
+import React, { FC, useEffect, useState } from 'react';
+import { colorSuggester } from './utils/color-suggester';
 
-export interface Props extends HTMLAttributes<HTMLDivElement> {
-  /** custom content, defaults to 'the snozzberries taste like snozzberries' */
-  children?: ReactChild;
-}
+export type Props = {
+  baseColor: string;
+};
 
-// Please do not use types off of a default export module or else Storybook Docs will suffer.
-// see: https://github.com/storybookjs/storybook/issues/9556
-/**
- * A custom Thing component. Neat!
- */
-export const Thing: FC<Props> = ({ children }) => {
-  return <div>{children || `the snozzberries taste like snozzberries`}</div>;
+// TODO: make background changeable by storybook control.
+// TODO: improve display of suggested colours.
+
+export const Main: FC<Props> = ({ baseColor }) => {
+  const [suggestedColors, setSuggestedColors] = useState<
+    string | string[] | undefined
+  >();
+
+  useEffect(() => {
+    setSuggestedColors(colorSuggester('#ffffff', baseColor));
+  }, []);
+
+  return suggestedColors ? (
+    <>
+      <div>
+        <h1>Colour</h1>
+        <div
+          style={{
+            backgroundColor: baseColor,
+            width: '100px',
+            height: '100px',
+          }}
+        />
+      </div>
+      {Array.isArray(suggestedColors) ? (
+        suggestedColors.map((color, index) => (
+          <p key={index} style={{ color }}>
+            color
+          </p>
+        ))
+      ) : (
+        <p style={{ color: suggestedColors }}>color</p>
+      )}
+    </>
+  ) : null;
 };
